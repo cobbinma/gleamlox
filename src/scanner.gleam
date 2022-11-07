@@ -2,11 +2,11 @@ import token.{
   AndToken, BangEqualToken, BangToken, ClassToken, CommaToken, DotToken,
   ElseToken, EofToken, EqualEqualToken, EqualToken, FalseToken, ForToken,
   FunToken, GreaterEqualToken, GreaterToken, IdentifierToken, IfToken,
-  LeftBraceToken, LeftParenToken, LessEqualToken, LessToken, Literal, MinusToken,
-  NilToken, Null, NumberLiteral, NumberToken, OrToken, PlusToken, PrintToken,
-  ReturnToken, RightBraceToken, RightParenToken, SemicolonToken, SlashToken,
-  StarToken, StringLiteral, StringToken, SuperToken, ThisToken, Token, TokenType,
-  TrueToken, VarToken, WhileToken,
+  LeftBraceToken, LeftParenToken, LessEqualToken, LessToken, MinusToken,
+  NilToken, NumberToken, OrToken, PlusToken, PrintToken, ReturnToken,
+  RightBraceToken, RightParenToken, SemicolonToken, SlashToken, StarToken,
+  StringToken, SuperToken, ThisToken, Token, TokenType, TrueToken, VarToken,
+  WhileToken,
 }
 import snag.{Snag}
 import gleam/string
@@ -40,11 +40,10 @@ pub fn new(source: String) -> Scanner {
 }
 
 pub fn scan(scanner: Scanner) -> Result(List(Token), Snag) {
-  let scanner = scan_tokens(scanner)
-
   let scanner =
     scanner
-    |> add_token(EofToken, Null, "", scanner.line)
+    |> scan_tokens
+    |> add_token(EofToken, scanner.line)
 
   case scanner.has_error {
     False -> Ok(scanner.tokens)
@@ -64,14 +63,8 @@ fn has_error(scanner: Scanner, has_error: Bool) -> Scanner {
   Scanner(..scanner, has_error: has_error)
 }
 
-fn add_token(
-  scanner: Scanner,
-  token_type: TokenType,
-  literal: Literal,
-  lexeme: String,
-  line: Int,
-) -> Scanner {
-  let token = Token(token_type, lexeme, literal, line)
+fn add_token(scanner: Scanner, token_type: TokenType, line: Int) -> Scanner {
+  let token = Token(token_type, line)
 
   Scanner(
     ..scanner,
@@ -89,159 +82,69 @@ fn scan_tokens(scanner: Scanner) -> Scanner {
 
   case c {
     Ok("(") ->
-      add_token(
-        scanner,
-        LeftParenToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, LeftParenToken, scanner.line)
       |> scan_tokens
     Ok(")") ->
-      add_token(
-        scanner,
-        RightParenToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, RightParenToken, scanner.line)
       |> scan_tokens
     Ok("{") ->
-      add_token(
-        scanner,
-        LeftBraceToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, LeftBraceToken, scanner.line)
       |> scan_tokens
     Ok("}") ->
-      add_token(
-        scanner,
-        RightBraceToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, RightBraceToken, scanner.line)
       |> scan_tokens
     Ok(",") ->
-      add_token(
-        scanner,
-        CommaToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, CommaToken, scanner.line)
       |> scan_tokens
     Ok(".") ->
-      add_token(
-        scanner,
-        DotToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, DotToken, scanner.line)
       |> scan_tokens
     Ok("-") ->
-      add_token(
-        scanner,
-        MinusToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, MinusToken, scanner.line)
       |> scan_tokens
     Ok("+") ->
-      add_token(
-        scanner,
-        PlusToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, PlusToken, scanner.line)
       |> scan_tokens
     Ok(";") ->
-      add_token(
-        scanner,
-        SemicolonToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, SemicolonToken, scanner.line)
       |> scan_tokens
     Ok("*") ->
-      add_token(
-        scanner,
-        StarToken,
-        Null,
-        lexeme(scanner.source, scanner.start, scanner.current, ""),
-        scanner.line,
-      )
+      add_token(scanner, StarToken, scanner.line)
       |> scan_tokens
     Ok("!") ->
       case match(list.at(scanner.source, scanner.start + 1), "=") {
         True ->
           scanner
-          |> add_token(
-            BangEqualToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current + 1, ""),
-            scanner.line,
-          )
+          |> add_token(BangEqualToken, scanner.line)
           |> advance
           |> scan_tokens
         False ->
           scanner
-          |> add_token(
-            BangToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current, ""),
-            scanner.line,
-          )
+          |> add_token(BangToken, scanner.line)
           |> scan_tokens
       }
     Ok("=") ->
       case match(list.at(scanner.source, scanner.start + 1), "=") {
         True ->
           scanner
-          |> add_token(
-            EqualEqualToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current + 1, ""),
-            scanner.line,
-          )
+          |> add_token(EqualEqualToken, scanner.line)
           |> advance
           |> scan_tokens
         False ->
           scanner
-          |> add_token(
-            EqualToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current, ""),
-            scanner.line,
-          )
+          |> add_token(EqualToken, scanner.line)
           |> scan_tokens
       }
     Ok("<") ->
       case match(list.at(scanner.source, scanner.start + 1), "=") {
         True ->
           scanner
-          |> add_token(
-            LessEqualToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current + 1, ""),
-            scanner.line,
-          )
+          |> add_token(LessEqualToken, scanner.line)
           |> advance
           |> scan_tokens
         False ->
           scanner
-          |> add_token(
-            LessToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current, ""),
-            scanner.line,
-          )
+          |> add_token(LessToken, scanner.line)
           |> scan_tokens
       }
     Ok(">") ->
@@ -254,22 +157,12 @@ fn scan_tokens(scanner: Scanner) -> Scanner {
       {
         True ->
           scanner
-          |> add_token(
-            GreaterEqualToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current + 1, ""),
-            scanner.line,
-          )
+          |> add_token(GreaterEqualToken, scanner.line)
           |> advance
           |> scan_tokens
         False ->
           scanner
-          |> add_token(
-            GreaterToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current, ""),
-            scanner.line,
-          )
+          |> add_token(GreaterToken, scanner.line)
           |> scan_tokens
       }
     Ok("/") ->
@@ -280,24 +173,14 @@ fn scan_tokens(scanner: Scanner) -> Scanner {
           |> scan_tokens
         False ->
           scanner
-          |> add_token(
-            SlashToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current, ""),
-            scanner.line,
-          )
+          |> add_token(SlashToken, scanner.line)
           |> scan_tokens
       }
     Ok("o") ->
       case match(peek(scanner), "r") {
         True ->
           scanner
-          |> add_token(
-            OrToken,
-            Null,
-            lexeme(scanner.source, scanner.start, scanner.current + 1, ""),
-            scanner.line,
-          )
+          |> add_token(OrToken, scanner.line)
           |> advance
           |> scan_tokens
         False ->
@@ -409,9 +292,12 @@ fn string(scanner: Scanner) -> Scanner {
         "\"" ->
           scanner
           |> add_token(
-            StringToken,
-            StringLiteral,
-            lexeme(scanner.source, scanner.start, scanner.current + 1, ""),
+            StringToken(lexeme(
+              scanner.source,
+              scanner.start,
+              scanner.current + 1,
+              "",
+            )),
             scanner.line,
           )
         "\n" ->
@@ -478,9 +364,12 @@ fn number(scanner: Scanner) -> Scanner {
                 False ->
                   scanner
                   |> add_token(
-                    NumberToken,
-                    NumberLiteral,
-                    lexeme(scanner.source, scanner.start, scanner.current, ""),
+                    NumberToken(lexeme(
+                      scanner.source,
+                      scanner.start,
+                      scanner.current,
+                      "",
+                    )),
                     scanner.line,
                   )
               }
@@ -491,9 +380,12 @@ fn number(scanner: Scanner) -> Scanner {
         _ ->
           scanner
           |> add_token(
-            NumberToken,
-            NumberLiteral,
-            lexeme(scanner.source, scanner.start, scanner.current, ""),
+            NumberToken(lexeme(
+              scanner.source,
+              scanner.start,
+              scanner.current,
+              "",
+            )),
             scanner.line,
           )
           |> advance
@@ -523,9 +415,14 @@ fn identifier(scanner: Scanner) -> Scanner {
           let token_type =
             text
             |> keyword
-            |> result.unwrap(IdentifierToken)
+            |> result.unwrap(IdentifierToken(lexeme(
+              scanner.source,
+              scanner.start,
+              scanner.current,
+              "",
+            )))
           scanner
-          |> add_token(token_type, Null, text, scanner.line)
+          |> add_token(token_type, scanner.line)
           |> advance
         }
       }

@@ -27,9 +27,9 @@ pub type TokenType {
   LessEqualToken
 
   // Literals
-  IdentifierToken
-  StringToken
-  NumberToken
+  IdentifierToken(String)
+  StringToken(String)
+  NumberToken(String)
 
   //Keywords
   AndToken
@@ -52,22 +52,8 @@ pub type TokenType {
   EofToken
 }
 
-pub type Literal {
-  NumberLiteral
-  StringLiteral
-  Null
-}
-
-fn literal_to_string(literal: Literal) -> String {
-  case literal {
-    NumberLiteral -> "Number"
-    StringLiteral -> "String"
-    Null -> "Null"
-  }
-}
-
 pub type Token {
-  Token(token_type: TokenType, lexeme: String, literal: Literal, line: Int)
+  Token(token_type: TokenType, line: Int)
 }
 
 pub fn print_tokens(tokens: List(Token)) -> Result(Nil) {
@@ -78,52 +64,50 @@ pub fn print_tokens(tokens: List(Token)) -> Result(Nil) {
 }
 
 pub fn to_string(token: Token) -> String {
-  token_type_to_string(token.token_type) <> " " <> token.lexeme <> " " <> literal_to_string(
-    token.literal,
-  )
+  token_type_to_string(token.token_type)
 }
 
 fn token_type_to_string(token_type: TokenType) -> String {
   case token_type {
-    LeftParenToken -> "LeftParen"
-    RightParenToken -> "RightParen"
-    LeftBraceToken -> "LeftBrace"
-    RightBraceToken -> "RightBrace"
-    CommaToken -> "Comma"
-    DotToken -> "Dot"
-    MinusToken -> "Minus"
-    PlusToken -> "Plus"
-    SemicolonToken -> "Semicolon"
-    SlashToken -> "Slash"
-    StarToken -> "Star"
-    BangToken -> "Bang"
-    BangEqualToken -> "BangEqual"
-    EqualToken -> "Equal"
-    EqualEqualToken -> "EqualEqual"
-    GreaterToken -> "Greater"
-    GreaterEqualToken -> "GreaterEqual"
-    LessToken -> "Less"
-    LessEqualToken -> "LessEqual"
-    IdentifierToken -> "Identifier"
-    StringToken -> "String"
-    NumberToken -> "Number"
-    AndToken -> "And"
-    ClassToken -> "Class"
-    ElseToken -> "Else"
-    FalseToken -> "False"
-    FunToken -> "Fun"
-    ForToken -> "For"
-    IfToken -> "If"
-    NilToken -> "Nil"
-    OrToken -> "Or"
-    PrintToken -> "Print"
-    ReturnToken -> "Return"
-    SuperToken -> "Super"
-    ThisToken -> "This"
-    TrueToken -> "True"
-    VarToken -> "Var"
-    WhileToken -> "While"
-    EofToken -> "Eof"
+    LeftParenToken -> "("
+    RightParenToken -> ")"
+    LeftBraceToken -> "{"
+    RightBraceToken -> "}"
+    CommaToken -> ","
+    DotToken -> "."
+    MinusToken -> "-"
+    PlusToken -> "+"
+    SemicolonToken -> ";"
+    SlashToken -> "/"
+    StarToken -> "*"
+    BangToken -> "!"
+    BangEqualToken -> "!="
+    EqualToken -> "="
+    EqualEqualToken -> "=="
+    GreaterToken -> ">"
+    GreaterEqualToken -> ">="
+    LessToken -> "<"
+    LessEqualToken -> "<="
+    IdentifierToken(value) -> value
+    StringToken(value) -> value
+    NumberToken(value) -> value
+    AndToken -> "and"
+    ClassToken -> "class"
+    ElseToken -> "else"
+    FalseToken -> "false"
+    FunToken -> "fun"
+    ForToken -> "for"
+    IfToken -> "if"
+    NilToken -> "nil"
+    OrToken -> "or"
+    PrintToken -> "print"
+    ReturnToken -> "return"
+    SuperToken -> "super"
+    ThisToken -> "this"
+    TrueToken -> "true"
+    VarToken -> "var"
+    WhileToken -> "while"
+    EofToken -> "eof"
   }
 }
 
