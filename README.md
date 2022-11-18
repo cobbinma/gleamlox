@@ -1,24 +1,13 @@
 # gleamlox
 
-[![Package Version](https://img.shields.io/hexpm/v/gleamlox)](https://hex.pm/packages/gleamlox)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/gleamlox/)
+✨ Gleam Language Implementation of Lox Interpreted Language
 
-A Gleam project
+---
+
+I am adding to this project as I read [Crafting Interpreters by Robert Nystrom](http://craftinginterpreters.com).
 
 ## Quick start
 
 ```sh
-gleam run   # Run the project
-gleam test  # Run the tests
-gleam shell # Run an Erlang shell
+gleam run test.lox
 ```
-
-## Installation
-
-If available on Hex this package can be added to your Gleam project:
-
-```sh
-gleam add gleamlox
-```
-
-and its documentation can be found at <https://hexdocs.pm/gleamlox>.
